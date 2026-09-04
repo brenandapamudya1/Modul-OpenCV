@@ -2,7 +2,7 @@
 #include <iostream>
 
 int main() {
-    cv::Mat image = cv::imread("../assets/sample2.jpg");
+    cv::Mat image = cv::imread("../assets/photos/sample2.jpg");
 
     if (image.empty()) {
         std::cerr << "Could not open or find the image!" << std::endl;

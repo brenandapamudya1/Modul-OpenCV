@@ -2,7 +2,7 @@
 #include <iostream>
 
 int main() {
-    cv::VideoCapture cap("../assets/sample.mp4");
+    cv::VideoCapture cap("../assets/videos/sample.mp4");
     cv::Mat frame;
 
     while (cap.isOpened()) {
