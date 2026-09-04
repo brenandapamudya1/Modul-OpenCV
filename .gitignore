@@ -1,0 +1,15 @@
+# Compiled binaries (g++ output)
+1-akses/gambar
+1-akses/video
+1-akses/kamera
+2-manipulasi/flip
+2-manipulasi/resize
+2-manipulasi/roi
+
+# Object files
+*.o
+*.obj
+
+# Debug files
+*.dSYM/
+*.su
