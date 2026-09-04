@@ -7,16 +7,17 @@ int main() {
 		std::cerr<<"Couldn't open or find the image"<<std::endl;
 		return -1;
 	}
-	// tambahkan variable flipped
+	// Variabel Flipped
 	cv::Mat flipped;
-	// function flip sesuai arah
-    // 0 = flip vertikal, 1 = flip horizontal, -1 = flip keduanya
+	
+	// Function Flip
+	// 0 = flip vertically, 1 = flip horizontally, -1 = flip both vertically and horizontally
 	cv::flip(image, flipped, 1);
 
-	// simpan hasil ke folder result
+	// Simpan Hasil
 	cv::imwrite("../assets/result/flipped.jpg", flipped);
 
-	// show perbedaan imagenya
+	// Perbedaan
 	cv::imshow("Gambar", image);
 	cv::imshow("Flipped", flipped);
 	cv::waitKey(0);

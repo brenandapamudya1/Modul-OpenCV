@@ -7,15 +7,16 @@ int main() {
 		std::cerr<<"Couldn't open or find the image"<<std::endl;
 		return -1;
 	}
-	// tambahkan variable resized
+	// Variabel Resized
 	cv::Mat resized;
-	// function resize
+
+	// Function Resize
 	cv::resize(image, resized, cv::Size(640, 480));
 
-	// simpan hasil ke folder result
+	// Simpan Hasil
 	cv::imwrite("../assets/result/resize.jpg", resized);
 
-	// show perbedaan imagenya
+	// Perbedaan
 	cv::imshow("Gambar", image);
 	cv::imshow("Resized", resized);
 	cv::waitKey(0);

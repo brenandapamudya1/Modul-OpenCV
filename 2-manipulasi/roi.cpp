@@ -7,14 +7,14 @@ int main() {
 		std::cerr<<"Couldn't open or find the image"<<std::endl;
 		return -1;
 	}
-	// tambahkan variable roi
+	// Variabel ROI
     cv::Rect ROI(300, 200, 640, 480); // x, y, width, height
 	cv::Mat roi_image = image(ROI);
 
-	// simpan hasil ke folder result
+	// Simpan Hasil
 	cv::imwrite("../assets/result/roi.jpg", roi_image);
 
-    // perbedaannya
+    // Perbedaan
     cv::imshow("Gambar", image);
     cv::imshow("Region of Interest", roi_image);
     cv::waitKey(0);
