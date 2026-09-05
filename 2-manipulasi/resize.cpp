@@ -14,7 +14,7 @@ int main() {
 	cv::resize(image, resized, cv::Size(640, 480));
 
 	// Simpan Hasil
-	cv::imwrite("../assets/result/resize.jpg", resized);
+	cv::imwrite("../assets/result/2-manipulasi/resize.jpg", resized);
 
 	// Perbedaan
 	cv::imshow("Gambar", image);

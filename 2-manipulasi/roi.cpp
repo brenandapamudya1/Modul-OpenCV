@@ -12,7 +12,7 @@ int main() {
 	cv::Mat roi_image = image(ROI);
 
 	// Simpan Hasil
-	cv::imwrite("../assets/result/roi.jpg", roi_image);
+	cv::imwrite("../assets/result/2-manipulasi/roi.jpg", roi_image);
 
     // Perbedaan
     cv::imshow("Gambar", image);

@@ -15,7 +15,7 @@ int main() {
 	cv::flip(image, flipped, 1);
 
 	// Simpan Hasil
-	cv::imwrite("../assets/result/flipped.jpg", flipped);
+	cv::imwrite("../assets/result/2-manipulasi/flipped.jpg", flipped);
 
 	// Perbedaan
 	cv::imshow("Gambar", image);
