@@ -11,9 +11,9 @@
 4-bev/main
 
 # Results
-assets/results/2-manipulasi/*
-assets/results/3-segmentation/*
-assets/results/4-bev/*
+assets/result/2-manipulasi/*.jpg
+assets/result/3-segmentation/*.jpg
+assets/result/4-bev/*.jpg
 
 # Object files
 *.o

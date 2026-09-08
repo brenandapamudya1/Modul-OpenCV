@@ -106,8 +106,8 @@ int main() {
     cv::warpPerspective(image, BEV_view, BEV_plot, image.size());
 
     // Simpan Hasil
-    cv::imwrite("../assets/results/4-bev/BEV_view.jpg", BEV_view);
-    cv::imwrite("../assets/results/4-bev/Segmented_Image.jpg", segment);
+    cv::imwrite("../assets/result/4-bev/BEV_view.jpg", BEV_view);
+    cv::imwrite("../assets/result/4-bev/Segmented_Image.jpg", segment);
 
     // Menampilkan hasil
     cv::imshow("Image", image);
