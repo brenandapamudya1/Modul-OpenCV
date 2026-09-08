@@ -5,6 +5,15 @@
 2-manipulasi/flip
 2-manipulasi/resize
 2-manipulasi/roi
+3-segmentation/convert
+3-segmentation/thresholding
+3-segmentation/morphology
+4-bev/main
+
+# Results
+assets/results/2-manipulasi/*
+assets/results/3-segmentation/*
+assets/results/4-bev/*
 
 # Object files
 *.o
