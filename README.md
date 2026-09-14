@@ -3,6 +3,21 @@
 **Author**: Brenanda Caesa Pamudya  
 **Email**: brenandapamudya178@gmail.com  
 
+```text
+         .----------.
+       .'            '.
+      /       ||       \
+     |        ||        |
+     |        ||        |
+     |        ||        |
+     |        ||        |
+      \       ||       /
+       '.            .'
+         '----------'
+
+      I  R  I  S
+```
+
 ---
 
 Repositori ini berisi rangkaian modul praktikum dan eksperimen pemrosesan citra digital (*digital image processing*) serta komputer visi (*computer vision*) menggunakan library **OpenCV 4** berbasis **C++**.
