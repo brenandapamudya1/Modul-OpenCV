@@ -1,5 +1,5 @@
 /*
-    * Single Camera Calibration menggunakan chessboard pattern.
+    * Stereo Camera Calibration menggunakan chessboard pattern.
 */
 
 #include <opencv2/opencv.hpp>
@@ -14,12 +14,14 @@ int main() {
 	std::string outputPath = "yaml/kalibrasi.yaml";
 
 	// Daftar gambar kalibrasi
-	std::vector<std::string> imageFiles;
 	std::vector<int> indices = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14};
+	std::vector<std::string> leftFiles, rightFiles;
 	for (int idx : indices) {
-		char filename[32];
-		snprintf(filename, sizeof(filename), "left%02d.jpg", idx);
-		imageFiles.push_back(imageDir + filename);
+		char lname[32], rname[32];
+		snprintf(lname, sizeof(lname), "left%02d.jpg", idx);
+		snprintf(rname, sizeof(rname), "right%02d.jpg", idx);
+		leftFiles.push_back(imageDir + lname);
+		rightFiles.push_back(imageDir + rname);
 	}
 
 	// Object points (koordinat 3D chessboard)
@@ -29,39 +31,61 @@ int main() {
 			objp.push_back(cv::Point3f(j * squareSize, i * squareSize, 0));
 
 	std::vector<std::vector<cv::Point3f>> objectPoints;
-	std::vector<std::vector<cv::Point2f>> imagePoints;
+	std::vector<std::vector<cv::Point2f>> imagePointsL, imagePointsR;
 	cv::Size imageSize;
 
-	// Deteksi chessboard corners
-	for (size_t i = 0; i < imageFiles.size(); i++) {
-		cv::Mat image = cv::imread(imageFiles[i]);
-		if (image.empty()) continue;
+	// Deteksi chessboard corners pada kedua kamera
+	for (size_t i = 0; i < leftFiles.size(); i++) {
+		cv::Mat imgL = cv::imread(leftFiles[i]);
+		cv::Mat imgR = cv::imread(rightFiles[i]);
+		if (imgL.empty() || imgR.empty()) continue;
 
-		if (imageSize.empty()) imageSize = image.size();
+		if (imageSize.empty()) imageSize = imgL.size();
 
-		cv::Mat gray;
-		cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+		cv::Mat grayL, grayR;
+		cv::cvtColor(imgL, grayL, cv::COLOR_BGR2GRAY);
+		cv::cvtColor(imgR, grayR, cv::COLOR_BGR2GRAY);
 
-		std::vector<cv::Point2f> corners;
-		bool found = cv::findChessboardCorners(gray, boardSize, corners,
-			cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK
-		);
+		std::vector<cv::Point2f> cornersL, cornersR;
+		int flags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
+		bool foundL = cv::findChessboardCorners(grayL, boardSize, cornersL, flags);
+		bool foundR = cv::findChessboardCorners(grayR, boardSize, cornersR, flags);
 
-		if (found) {
-			cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
-				cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.001)
-			);
+		if (foundL && foundR) {
+			cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.001);
+			cv::cornerSubPix(grayL, cornersL, cv::Size(11, 11), cv::Size(-1, -1), criteria);
+			cv::cornerSubPix(grayR, cornersR, cv::Size(11, 11), cv::Size(-1, -1), criteria);
 			objectPoints.push_back(objp);
-			imagePoints.push_back(corners);
+			imagePointsL.push_back(cornersL);
+			imagePointsR.push_back(cornersR);
 		}
 	}
 
-	// Kalibrasi
-	cv::Mat cameraMatrix, distCoeffs;
-	std::vector<cv::Mat> rvecs, tvecs;
-	double rmsError = cv::calibrateCamera(
-		objectPoints, imagePoints, imageSize,
-		cameraMatrix, distCoeffs, rvecs, tvecs
+	// Single camera calibration (left & right)
+	cv::Mat cameraMatrixL, distCoeffsL, cameraMatrixR, distCoeffsR;
+	std::vector<cv::Mat> rvecsL, tvecsL, rvecsR, tvecsR;
+
+	double rmsL = cv::calibrateCamera(objectPoints, imagePointsL, imageSize,
+		cameraMatrixL, distCoeffsL, rvecsL, tvecsL);
+	double rmsR = cv::calibrateCamera(objectPoints, imagePointsR, imageSize,
+		cameraMatrixR, distCoeffsR, rvecsR, tvecsR);
+
+	// Stereo calibration
+	cv::Mat R, T, E, F;
+	double rmsStereo = cv::stereoCalibrate(
+		objectPoints, imagePointsL, imagePointsR,
+		cameraMatrixL, distCoeffsL, cameraMatrixR, distCoeffsR,
+		imageSize, R, T, E, F,
+		cv::CALIB_FIX_INTRINSIC,
+		cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 100, 1e-6)
+	);
+
+	// Stereo rectification
+	cv::Mat R1, R2, P1, P2, Q;
+	cv::stereoRectify(
+		cameraMatrixL, distCoeffsL, cameraMatrixR, distCoeffsR,
+		imageSize, R, T, R1, R2, P1, P2, Q,
+		cv::CALIB_ZERO_DISPARITY, -1, imageSize
 	);
 
 	// Simpan hasil ke YAML
@@ -76,29 +100,57 @@ int main() {
 	fs << "board_width" << boardSize.width;
 	fs << "board_height" << boardSize.height;
 	fs << "square_size" << squareSize;
-	fs << "camera_matrix" << cameraMatrix;
-	fs << "distortion_coefficients" << distCoeffs;
-	fs << "reprojection_error" << rmsError;
 	fs << "images_used" << (int)objectPoints.size();
+
+	// Left camera
+	fs << "camera_matrix_left" << cameraMatrixL;
+	fs << "distortion_coefficients_left" << distCoeffsL;
+	fs << "reprojection_error_left" << rmsL;
+
+	// Right camera
+	fs << "camera_matrix_right" << cameraMatrixR;
+	fs << "distortion_coefficients_right" << distCoeffsR;
+	fs << "reprojection_error_right" << rmsR;
+
+	// Stereo params
+	fs << "R" << R;
+	fs << "T" << T;
+	fs << "E" << E;
+	fs << "F" << F;
+	fs << "reprojection_error_stereo" << rmsStereo;
+
+	// Rectification params
+	fs << "R1" << R1;
+	fs << "R2" << R2;
+	fs << "P1" << P1;
+	fs << "P2" << P2;
+	fs << "Q" << Q;
+
 	fs.release();
 
-	std::cout << "RMS Error: " << rmsError << " px" << std::endl;
+	std::cout << "RMS Left: " << rmsL << " px" << std::endl;
+	std::cout << "RMS Right: " << rmsR << " px" << std::endl;
+	std::cout << "RMS Stereo: " << rmsStereo << " px" << std::endl;
 	std::cout << "Disimpan ke: " << outputPath << std::endl;
 
-	// Visualisasi: Original vs Undistorted
-	cv::Mat sample = cv::imread(imageFiles[0]);
-	if (!sample.empty()) {
-		cv::Mat undistorted;
-		cv::undistort(sample, undistorted, cameraMatrix, distCoeffs);
+	// Visualisasi: Rectified pair
+	cv::Mat mapL1, mapL2, mapR1, mapR2;
+	cv::initUndistortRectifyMap(cameraMatrixL, distCoeffsL, R1, P1, imageSize, CV_16SC2, mapL1, mapL2);
+	cv::initUndistortRectifyMap(cameraMatrixR, distCoeffsR, R2, P2, imageSize, CV_16SC2, mapR1, mapR2);
+
+	cv::Mat sampleL = cv::imread(leftFiles[0]);
+	cv::Mat sampleR = cv::imread(rightFiles[0]);
+	if (!sampleL.empty() && !sampleR.empty()) {
+		cv::Mat rectL, rectR;
+		cv::remap(sampleL, rectL, mapL1, mapL2, cv::INTER_LINEAR);
+		cv::remap(sampleR, rectR, mapR1, mapR2, cv::INTER_LINEAR);
 
 		cv::Mat comparison;
-		cv::hconcat(sample, undistorted, comparison);
-		cv::putText(comparison, "Original", cv::Point(10, 30),
-			cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
-		cv::putText(comparison, "Undistorted", cv::Point(sample.cols + 10, 30),
-			cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+		cv::hconcat(rectL, rectR, comparison);
+		for (int y = 0; y < comparison.rows; y += 32)
+			cv::line(comparison, cv::Point(0, y), cv::Point(comparison.cols, y), cv::Scalar(0, 255, 0));
 
-		cv::imshow("Kalibrasi: Original vs Undistorted", comparison);
+		cv::imshow("Rectified Stereo Pair", comparison);
 		cv::waitKey(0);
 	}
 
