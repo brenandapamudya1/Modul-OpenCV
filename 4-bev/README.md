@@ -1,5 +1,11 @@
 # Modul 4 - Bird's Eye View & Kalibrasi Kamera dengan OpenCV
 
+**Author**: Brenanda Caesa Pamudya  
+**Email**: brenandapamudya178@gmail.com  
+> *If you have any questions or feedback, feel free to reach out via email!*
+
+---
+
 Modul ini menjelaskan teknik transformasi perspektif Bird's Eye View (BEV),
 kalibrasi kamera, dan estimasi depth menggunakan library OpenCV di C++.
 Terdapat tiga program yang mencakup transformasi BEV dari gambar jalan,
@@ -314,13 +320,4 @@ rm -f 1_bev 2_calib 3_depth
 - Dataset kalibrasi berasal dari
   [OpenCV Samples](https://github.com/opencv/opencv/tree/4.x/samples/data).
 - Tekan tombol apapun pada jendela untuk menutup program.
-
----
-
-## Author
-
-- **Name**: Brenanda Caesa Pamudya
-- **Email**: brenandapamudya178@gmail.com
-
-If you have any questions or feedback, feel free to reach out via email!
 
