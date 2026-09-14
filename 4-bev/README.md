@@ -177,7 +177,7 @@ Menyimpan semua parameter intrinsik ke file `yaml/kalibrasi.yaml`.
 
 Program ini menghitung estimasi jarak/kedalaman ($Z$) dan posisi 3D ($X, Y, Z$) dari kamera tunggal (seperti webcam atau smartphone) menggunakan **Pinhole Camera Model**.
 
-### 📐 Alur Penurunan Rumus Pinhole Camera Model
+### Alur Penurunan Rumus Pinhole Camera Model
 
 Pinhole Camera Model memanfaatkan prinsip **kesamaan segitiga** (*triangle similarity*) antara objek fisik di ruang 3D dunia nyata dan bayangan/proyeksi objek pada bidang citra 2D (sensor kamera):
 
@@ -206,7 +206,7 @@ Dengan mengisolasi $Z$, kita mendapatkan rumus kedalaman/jarak objek:
 
 $$Z = \frac{f_x \cdot W_{\text{real}}}{w_{\text{pixel}}}$$
 
-### 📌 Keterangan Parameter & Variabel
+### Keterangan Parameter & Variabel
 
 1. **$f_x$ & $f_y$ (*Focal Length in Pixels*)**:
    - Jarak fokus lensa kamera yang dinyatakan dalam satuan piksel pada sumbu horizontal ($f_x$) dan vertikal ($f_y$).
