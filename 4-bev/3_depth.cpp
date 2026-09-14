@@ -27,7 +27,7 @@ int main() {
 	double cy = fs["principal_point_y"];
 	int boardWidth = fs["board_width"];
 	int boardHeight = fs["board_height"];
-	float squareSize = fs["square_size"]; // mm
+	float squareSize = fs["square_size"];
 	fs.release();
 
 	// 2. Baca gambar input
@@ -109,6 +109,8 @@ int main() {
 
 	std::cout << "--- Single Camera Pinhole Depth Estimation ---" << std::endl;
 	std::cout << "Focal Length (fx): " << fx << " px" << std::endl;
+	std::cout << "Focal Length (fy): " << fy << " px" << std::endl;
+	std::cout << "Koordinat Pusat (cx, cy): (" << cx << ", " << cy << ")" << std::endl;
 	std::cout << "Lebar Objek Fisik (W_real): " << realWidthMM << " mm" << std::endl;
 	std::cout << "Lebar Objek Piksel (w_pixel): " << pixelWidth << " px" << std::endl;
 	std::cout << "Kedalaman Terhitung (Z): " << depthZ << " mm (" << (depthZ / 1000.0) << " m)" << std::endl;
