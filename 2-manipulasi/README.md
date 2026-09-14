@@ -21,10 +21,10 @@ sudo apt install libopencv-dev
 
 ```
 2-manipulasi/
-├── flip.cpp    # Program pencerminan gambar
-├── resize.cpp  # Program perubahan ukuran gambar
-├── roi.cpp     # Program pemotongan region of interest
-└── README.md   # Dokumentasi modul
+├── 1_flip.cpp    # Program pencerminan gambar
+├── 2_resize.cpp  # Program perubahan ukuran gambar
+├── 3_roi.cpp     # Program pemotongan region of interest
+└── README.md     # Dokumentasi modul
 ```
 
 Asset yang digunakan oleh ketiga program terdapat di folder `assets/`:
@@ -38,7 +38,7 @@ assets/
 
 ---
 
-## 1. flip.cpp - Pencerminan Gambar (Flip)
+## 1. 1_flip.cpp - Pencerminan Gambar (Flip)
 
 Program ini membaca file gambar dan melakukan pencerminan (flip) pada gambar.
 Terdapat tiga mode flip yang tersedia:
@@ -50,20 +50,20 @@ Terdapat tiga mode flip yang tersedia:
 ### Cara Compile
 
 ```bash
-g++ flip.cpp -o flip $(pkg-config --cflags --libs opencv4)
+g++ 1_flip.cpp -o 1_flip $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./flip
+./1_flip
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ flip.cpp -o flip -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
-./flip
+g++ 1_flip.cpp -o 1_flip -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+./1_flip
 ```
 
 ### Penjelasan Kode
@@ -82,27 +82,27 @@ g++ flip.cpp -o flip -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lo
 
 ---
 
-## 2. resize.cpp - Perubahan Ukuran Gambar (Resize)
+## 2. 2_resize.cpp - Perubahan Ukuran Gambar (Resize)
 
 Program ini membaca file gambar dan mengubah ukurannya menjadi 640x480 pixel.
 
 ### Cara Compile
 
 ```bash
-g++ resize.cpp -o resize $(pkg-config --cflags --libs opencv4)
+g++ 2_resize.cpp -o 2_resize $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./resize
+./2_resize
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ resize.cpp -o resize -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
-./resize
+g++ 2_resize.cpp -o 2_resize -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+./2_resize
 ```
 
 ### Penjelasan Kode
@@ -122,7 +122,7 @@ g++ resize.cpp -o resize -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs
 
 ---
 
-## 3. roi.cpp - Region of Interest (ROI)
+## 3. 3_roi.cpp - Region of Interest (ROI)
 
 Program ini membaca file gambar dan memotong region of interest (area tertentu)
 dari gambar berdasarkan koordinat rect (x, y, width, height).
@@ -130,20 +130,20 @@ dari gambar berdasarkan koordinat rect (x, y, width, height).
 ### Cara Compile
 
 ```bash
-g++ roi.cpp -o roi $(pkg-config --cflags --libs opencv4)
+g++ 3_roi.cpp -o 3_roi $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./roi
+./3_roi
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ roi.cpp -o roi -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
-./roi
+g++ 3_roi.cpp -o 3_roi -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+./3_roi
 ```
 
 ### Penjelasan Kode
@@ -170,15 +170,15 @@ g++ roi.cpp -o roi -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lope
 ## Compile Semua Program Sekaligus
 
 ```bash
-g++ flip.cpp -o flip $(pkg-config --cflags --libs opencv4) && \
-g++ resize.cpp -o resize $(pkg-config --cflags --libs opencv4) && \
-g++ roi.cpp -o roi $(pkg-config --cflags --libs opencv4)
+g++ 1_flip.cpp -o 1_flip $(pkg-config --cflags --libs opencv4) && \
+g++ 2_resize.cpp -o 2_resize $(pkg-config --cflags --libs opencv4) && \
+g++ 3_roi.cpp -o 3_roi $(pkg-config --cflags --libs opencv4)
 ```
 
 ## Membersihkan File Binary
 
 ```bash
-rm -f flip resize roi
+rm -f 1_flip 2_resize 3_roi
 ```
 
 ## Catatan
@@ -187,8 +187,8 @@ rm -f flip resize roi
   di atas folder `2-manipulasi/`.
 - Path file dalam kode menggunakan `../assets/` karena binary program dijalankan
   dari dalam folder `2-manipulasi/`.
-- Untuk flip.cpp, ubah parameter ketiga `cv::flip()` untuk mengubah arah flip.
-- Untuk resize.cpp, ubah `cv::Size(640, 480)` untuk mengubah ukuran target.
-- Untuk roi.cpp, ubah nilai `cv::Rect(x, y, width, height)` untuk memilih area
+- Untuk 1_flip.cpp, ubah parameter ketiga `cv::flip()` untuk mengubah arah flip.
+- Untuk 2_resize.cpp, ubah `cv::Size(640, 480)` untuk mengubah ukuran target.
+- Untuk 3_roi.cpp, ubah nilai `cv::Rect(x, y, width, height)` untuk memilih area
   yang berbeda dari gambar.
 - Tekan tombol apapun pada jendela untuk menutup program.

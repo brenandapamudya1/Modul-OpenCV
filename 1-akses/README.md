@@ -21,10 +21,10 @@ sudo apt install libopencv-dev
 
 ```
 1-akses/
-├── gambar.cpp    # Program pembacaan dan tampilan gambar
-├── video.cpp     # Program pemutaran file video
-├── kamera.cpp    # Program akses kamera real-time
-└── README.md     # Dokumentasi modul
+├── 1_gambar.cpp    # Program pembacaan dan tampilan gambar
+├── 2_video.cpp     # Program pemutaran file video
+├── 3_kamera.cpp    # Program akses kamera real-time
+└── README.md       # Dokumentasi modul
 ```
 
 Asset yang digunakan oleh ketiga program terdapat di folder `assets/`:
@@ -38,27 +38,27 @@ assets/
 
 ---
 
-## 1. gambar.cpp - Membaca dan Menampilkan Gambar
+## 1. 1_gambar.cpp - Membaca dan Menampilkan Gambar
 
 Program ini membaca file gambar dari disk dan menampilkannya di jendela baru.
 
 ### Cara Compile
 
 ```bash
-g++ gambar.cpp -o gambar $(pkg-config --cflags --libs opencv4)
+g++ 1_gambar.cpp -o 1_gambar $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./gambar
+./1_gambar
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ gambar.cpp -o gambar -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
-./gambar
+g++ 1_gambar.cpp -o 1_gambar -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+./1_gambar
 ```
 
 ### Penjelasan Kode
@@ -73,7 +73,7 @@ g++ gambar.cpp -o gambar -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs
 
 ---
 
-## 2. video.cpp - Memutar File Video
+## 2. 2_video.cpp - Memutar File Video
 
 Program ini membaca file video frame demi frame dan menampilkannya secara berurutan
 hingga video selesai atau pengguna menekan tombol `q`.
@@ -81,20 +81,20 @@ hingga video selesai atau pengguna menekan tombol `q`.
 ### Cara Compile
 
 ```bash
-g++ video.cpp -o video $(pkg-config --cflags --libs opencv4)
+g++ 2_video.cpp -o 2_video $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./video
+./2_video
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ video.cpp -o video -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_videoio
-./video
+g++ 2_video.cpp -o 2_video -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_videoio
+./2_video
 ```
 
 ### Penjelasan Kode
@@ -111,7 +111,7 @@ g++ video.cpp -o video -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -
 
 ---
 
-## 3. kamera.cpp - Akses Kamera Real-Time
+## 3. 3_kamera.cpp - Akses Kamera Real-Time
 
 Program ini mengakses kamera perangkat (webcam) dan menampilkan feed secara
 real-time hingga pengguna menekan tombol `q`.
@@ -119,20 +119,20 @@ real-time hingga pengguna menekan tombol `q`.
 ### Cara Compile
 
 ```bash
-g++ kamera.cpp -o kamera $(pkg-config --cflags --libs opencv4)
+g++ 3_kamera.cpp -o 3_kamera $(pkg-config --cflags --libs opencv4)
 ```
 
 ### Cara Jalankan
 
 ```bash
-./kamera
+./3_kamera
 ```
 
 ### Cara Jalankan (tanpa pkg-config)
 
 ```bash
-g++ kamera.cpp -o kamera -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_videoio
-./kamera
+g++ 3_kamera.cpp -o 3_kamera -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_videoio
+./3_kamera
 ```
 
 ### Penjelasan Kode
@@ -153,15 +153,15 @@ g++ kamera.cpp -o kamera -I/usr/include/opencv4 -lopencv_core -lopencv_imgcodecs
 ## Compile Semua Program Sekaligus
 
 ```bash
-g++ gambar.cpp -o gambar $(pkg-config --cflags --libs opencv4) && \
-g++ video.cpp -o video $(pkg-config --cflags --libs opencv4) && \
-g++ kamera.cpp -o kamera $(pkg-config --cflags --libs opencv4)
+g++ 1_gambar.cpp -o 1_gambar $(pkg-config --cflags --libs opencv4) && \
+g++ 2_video.cpp -o 2_video $(pkg-config --cflags --libs opencv4) && \
+g++ 3_kamera.cpp -o 3_kamera $(pkg-config --cflags --libs opencv4)
 ```
 
 ## Membersihkan File Binary
 
 ```bash
-rm -f gambar video kamera
+rm -f 1_gambar 2_video 3_kamera
 ```
 
 ## Catatan
