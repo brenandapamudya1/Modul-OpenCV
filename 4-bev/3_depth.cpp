@@ -1,132 +1,120 @@
 /*
-    * Stereo Depth Estimation menggunakan StereoSGBM.
+    * Monocular Depth Estimation (Single Camera Pinhole Model)
+    * Z = (fx * W_real) / w_pixel
 */
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <vector>
 #include <string>
 
 int main() {
 	std::string calibPath = "yaml/kalibrasi.yaml";
-	std::string leftPath = "../assets/calib/left01.jpg";
-	std::string rightPath = "../assets/calib/right01.jpg";
-	std::string outputDir = "../assets/result/4-bev/";
-	std::string depthOutput = "yaml/depth.yaml";
+	std::string imagePath = "../assets/calib/left01.jpg";
+	std::string outputPath = "../assets/result/4-bev/depth_pinhole.jpg";
+	std::string yamlPath = "yaml/depth.yaml";
 
-	// Load parameter kalibrasi
+	// 1. Baca parameter kalibrasi kamera
 	cv::FileStorage fs(calibPath, cv::FileStorage::READ);
 	if (!fs.isOpened()) {
-		std::cerr << "Tidak bisa membuka " << calibPath << std::endl;
+		std::cerr << "Gagal membuka file kalibrasi: " << calibPath << std::endl;
 		return -1;
 	}
 
-	cv::Mat cameraMatrixL, distCoeffsL, cameraMatrixR, distCoeffsR;
-	cv::Mat R1, R2, P1, P2, Q;
-
-	fs["camera_matrix_left"] >> cameraMatrixL;
-	fs["distortion_coefficients_left"] >> distCoeffsL;
-	fs["camera_matrix_right"] >> cameraMatrixR;
-	fs["distortion_coefficients_right"] >> distCoeffsR;
-	fs["R1"] >> R1;
-	fs["R2"] >> R2;
-	fs["P1"] >> P1;
-	fs["P2"] >> P2;
-	fs["Q"] >> Q;
+	double fx = fs["focal_length_x"];
+	double fy = fs["focal_length_y"];
+	double cx = fs["principal_point_x"];
+	double cy = fs["principal_point_y"];
+	int boardWidth = fs["board_width"];
+	int boardHeight = fs["board_height"];
+	float squareSize = fs["square_size"]; // mm
 	fs.release();
 
-	// Load gambar stereo
-	cv::Mat imgL = cv::imread(leftPath);
-	cv::Mat imgR = cv::imread(rightPath);
-	if (imgL.empty() || imgR.empty()) {
-		std::cerr << "Tidak bisa membuka gambar stereo" << std::endl;
+	// 2. Baca gambar input
+	cv::Mat img = cv::imread(imagePath);
+	if (img.empty()) {
+		std::cerr << "Gagal membuka gambar: " << imagePath << std::endl;
 		return -1;
 	}
 
-	// Rectify gambar
-	cv::Mat mapL1, mapL2, mapR1, mapR2;
-	cv::initUndistortRectifyMap(cameraMatrixL, distCoeffsL, R1, P1, imgL.size(), CV_16SC2, mapL1, mapL2);
-	cv::initUndistortRectifyMap(cameraMatrixR, distCoeffsR, R2, P2, imgR.size(), CV_16SC2, mapR1, mapR2);
+	cv::Mat gray;
+	cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
 
-	cv::Mat rectL, rectR;
-	cv::remap(imgL, rectL, mapL1, mapL2, cv::INTER_LINEAR);
-	cv::remap(imgR, rectR, mapR1, mapR2, cv::INTER_LINEAR);
+	// 3. Deteksi objek referensi (Chessboard pattern)
+	cv::Size boardSize(boardWidth, boardHeight);
+	std::vector<cv::Point2f> corners;
+	int flags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
+	bool found = cv::findChessboardCorners(gray, boardSize, corners, flags);
 
-	// Convert ke grayscale
-	cv::Mat grayL, grayR;
-	cv::cvtColor(rectL, grayL, cv::COLOR_BGR2GRAY);
-	cv::cvtColor(rectR, grayR, cv::COLOR_BGR2GRAY);
-
-	// StereoSGBM
-	int numDisparities = 16 * 5;
-	int blockSize = 5;
-	auto stereo = cv::StereoSGBM::create(
-		0, numDisparities, blockSize,
-		8 * 3 * blockSize * blockSize,      // P1
-		32 * 3 * blockSize * blockSize,     // P2
-		1, 63, 10, 100, 32,
-		cv::StereoSGBM::MODE_SGBM_3WAY
-	);
-
-	cv::Mat disparity;
-	stereo->compute(grayL, grayR, disparity);
-
-	// Normalize disparity untuk visualisasi
-	cv::Mat disparityGray, disparityColor;
-	cv::normalize(disparity, disparityGray, 0, 255, cv::NORM_MINMAX, CV_8U);
-	cv::applyColorMap(disparityGray, disparityColor, cv::COLORMAP_JET);
-
-	// Konversi disparity ke depth 3D
-	cv::Mat dispFloat;
-	disparity.convertTo(dispFloat, CV_32F, 1.0 / 16.0);
-	cv::Mat depth3D;
-	cv::reprojectImageTo3D(dispFloat, depth3D, Q, true);
-
-	// Depth values di 5 titik sample
-	int h = imgL.rows, w = imgL.cols;
-	cv::Point2i samplePoints[] = {
-		{w / 2, h / 2},         // Center
-		{w / 4, h / 4},         // Top-left
-		{3 * w / 4, h / 4},    // Top-right
-		{w / 4, 3 * h / 4},    // Bottom-left
-		{3 * w / 4, 3 * h / 4}  // Bottom-right
-	};
-	std::string pointNames[] = {"Center", "Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right"};
-
-	std::cout << "--- Depth Values ---" << std::endl;
-	for (int i = 0; i < 5; i++) {
-		cv::Vec3f point = depth3D.at<cv::Vec3f>(samplePoints[i].y, samplePoints[i].x);
-		float d = dispFloat.at<float>(samplePoints[i].y, samplePoints[i].x);
-		std::cout << pointNames[i] << " (" << samplePoints[i].x << "," << samplePoints[i].y << ")"
-				  << " -> X=" << point[0] << " Y=" << point[1] << " Z=" << point[2]
-				  << " mm (disp=" << d << ")" << std::endl;
+	if (!found) {
+		std::cerr << "Chessboard tidak terdeteksi pada gambar." << std::endl;
+		return -1;
 	}
 
-	// Simpan hasil
-	cv::imwrite(outputDir + "disparity_gray.jpg", disparityGray);
-	cv::imwrite(outputDir + "disparity_color.jpg", disparityColor);
+	cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.001);
+	cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1), criteria);
 
-	// Simpan depth data ke YAML
-	cv::FileStorage dfs(depthOutput, cv::FileStorage::WRITE);
-	if (dfs.isOpened()) {
-		dfs << "source_left" << leftPath;
-		dfs << "source_right" << rightPath;
-		dfs << "num_disparities" << numDisparities;
-		dfs << "block_size" << blockSize;
-		dfs << "Q_matrix" << Q;
-		dfs << "depth_3d" << depth3D;
-		dfs.release();
+	// Ukuran fisik asli objek referensi (jarak dari corner pertama ke corner terakhir pada baris atas)
+	// (boardWidth - 1) * squareSize = (9 - 1) * 25.0 mm = 200 mm
+	float realWidthMM = (boardWidth - 1) * squareSize;
+
+	// Mengukur lebar objek pada piksel citra (jarak piksel antar corner horizontal)
+	cv::Point2f topLeft = corners[0];
+	cv::Point2f topRight = corners[boardWidth - 1];
+	float pixelWidth = cv::norm(topRight - topLeft);
+
+	// 4. Hitung Jarak/Kedalaman Z (Pinhole Camera Model)
+	// Z = (fx * W_real) / w_pixel
+	double depthZ = (fx * realWidthMM) / pixelWidth;
+
+	// Pusat objek dalam piksel
+	cv::Rect bbox = cv::boundingRect(corners);
+	cv::Point2f centerPixel(bbox.x + bbox.width / 2.0f, bbox.y + bbox.height / 2.0f);
+
+	// Hitung koordinat 3D (X, Y, Z) dalam mm
+	double posX = ((centerPixel.x - cx) * depthZ) / fx;
+	double posY = ((centerPixel.y - cy) * depthZ) / fy;
+
+	// 5. Visualisasi Bounding Box, Pusat Objek, dan Teks Depth
+	cv::Mat result = img.clone();
+	cv::drawChessboardCorners(result, boardSize, corners, found);
+	cv::rectangle(result, bbox, cv::Scalar(0, 255, 0), 2);
+	cv::circle(result, centerPixel, 5, cv::Scalar(0, 0, 255), -1);
+
+	char depthStr[64], posStr[64];
+	snprintf(depthStr, sizeof(depthStr), "Depth Z: %.1f mm (%.2f m)", depthZ, depthZ / 1000.0);
+	snprintf(posStr, sizeof(posStr), "3D Pos: X=%.1f, Y=%.1f, Z=%.1f mm", posX, posY, depthZ);
+
+	cv::putText(result, depthStr, cv::Point(bbox.x, std::max(bbox.y - 25, 25)),
+		cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0, 255, 0), 2);
+	cv::putText(result, posStr, cv::Point(bbox.x, std::max(bbox.y - 8, 40)),
+		cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 0), 1);
+
+	cv::imwrite(outputPath, result);
+
+	// 6. Simpan data depth ke YAML
+	cv::FileStorage fsOut(yamlPath, cv::FileStorage::WRITE);
+	if (fsOut.isOpened()) {
+		fsOut << "image_path" << imagePath;
+		fsOut << "reference_width_real_mm" << realWidthMM;
+		fsOut << "reference_width_pixel" << pixelWidth;
+		fsOut << "focal_length_x" << fx;
+		fsOut << "depth_z_mm" << depthZ;
+		fsOut << "depth_z_meter" << (depthZ / 1000.0);
+		fsOut << "position_3d_x_mm" << posX;
+		fsOut << "position_3d_y_mm" << posY;
+		fsOut << "position_3d_z_mm" << depthZ;
+		fsOut.release();
 	}
 
-	std::cout << std::endl;
-	std::cout << "Disparity gray: " << outputDir + "disparity_gray.jpg" << std::endl;
-	std::cout << "Disparity color: " << outputDir + "disparity_color.jpg" << std::endl;
-	std::cout << "Depth data: " << depthOutput << std::endl;
-
-	// Visualisasi
-	cv::imshow("Left Rectified", rectL);
-	cv::imshow("Disparity (Grayscale)", disparityGray);
-	cv::imshow("Disparity (Colormap)", disparityColor);
-	cv::waitKey(0);
+	std::cout << "--- Single Camera Pinhole Depth Estimation ---" << std::endl;
+	std::cout << "Focal Length (fx): " << fx << " px" << std::endl;
+	std::cout << "Lebar Objek Fisik (W_real): " << realWidthMM << " mm" << std::endl;
+	std::cout << "Lebar Objek Piksel (w_pixel): " << pixelWidth << " px" << std::endl;
+	std::cout << "Kedalaman Terhitung (Z): " << depthZ << " mm (" << (depthZ / 1000.0) << " m)" << std::endl;
+	std::cout << "Posisi 3D: X=" << posX << " mm, Y=" << posY << " mm, Z=" << depthZ << " mm" << std::endl;
+	std::cout << "Output gambar tersimpan di: " << outputPath << std::endl;
+	std::cout << "Data depth tersimpan di: " << yamlPath << std::endl;
 
 	return 0;
 }
