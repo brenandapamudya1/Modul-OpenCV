@@ -175,16 +175,59 @@ Menyimpan semua parameter intrinsik ke file `yaml/kalibrasi.yaml`.
 
 ## 3. 3_depth.cpp - Monocular Depth Estimation (Pinhole Camera Model)
 
-Program ini menghitung estimasi jarak/kedalaman ($Z$) dari kamera tunggal (misal webcam atau HP)
-menggunakan **Pinhole Camera Model** berbasis perbandingan segitiga sebanding (*triangle similarity*):
+Program ini menghitung estimasi jarak/kedalaman ($Z$) dan posisi 3D ($X, Y, Z$) dari kamera tunggal (seperti webcam atau smartphone) menggunakan **Pinhole Camera Model**.
+
+### 📐 Alur Penurunan Rumus Pinhole Camera Model
+
+Pinhole Camera Model memanfaatkan prinsip **kesamaan segitiga** (*triangle similarity*) antara objek fisik di ruang 3D dunia nyata dan bayangan/proyeksi objek pada bidang citra 2D (sensor kamera):
+
+```text
+       Objek Fisik (W_real)
+      |-------------------|
+       \                 /
+        \               /
+         \  Jarak (Z)  /
+          \           /
+           \         /
+            \       /
+             \  •  /  <--- Pusat Optik Kamera (Camera Center / Focal Point)
+              /   \
+             /     \
+            /_______ \
+       Bayangan Piksel (w_pixel)
+       [Focal Length (fx)]
+```
+
+Dari hubungan kesamaan segitiga di atas, perbandingan antara ukuran fisik dan ukuran citra adalah konstan:
+
+$$\frac{w_{\text{pixel}}}{f_x} = \frac{W_{\text{real}}}{Z}$$
+
+Dengan mengisolasi $Z$, kita mendapatkan rumus kedalaman/jarak objek:
 
 $$Z = \frac{f_x \cdot W_{\text{real}}}{w_{\text{pixel}}}$$
 
-di mana:
-- $f_x$: Focal length kamera dalam piksel (dari `yaml/kalibrasi.yaml`)
-- $W_{\text{real}}$: Lebar fisik asli objek referensi (mm)
-- $w_{\text{pixel}}$: Lebar objek terukur pada gambar piksel
-- $Z$: Jarak terhitung dari kamera ke objek (mm atau meter)
+### 📌 Keterangan Parameter & Variabel
+
+1. **$f_x$ & $f_y$ (*Focal Length in Pixels*)**:
+   - Jarak fokus lensa kamera yang dinyatakan dalam satuan piksel pada sumbu horizontal ($f_x$) dan vertikal ($f_y$).
+   - Nilai $f_x$ dan $f_y$ diperoleh dari kalibrasi kamera (`2_calib.cpp`) pada matriks intrinsik $K$:
+     $$K = \begin{bmatrix} f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}$$
+
+2. **$c_x$ & $c_y$ (*Principal Point / Titik Pusat Optik*)**:
+   - **$c_x$**: Koordinat titik pusat optik lensa pada sumbu horizontal gambar (dalam piksel).
+   - **$c_y$**: Koordinat titik pusat optik lensa pada sumbu vertikal gambar (dalam piksel).
+   - **Fungsi $c_x$ dan $c_y$**: Menjadi titik acuan origin $(0,0,0)$ pada pusat optik lensa kamera (bukan di pojok kiri-atas citra $[0,0]$ piksel). Digunakan untuk menghitung pergeseran koordinat 3D horizontal ($X$) dan vertikal ($Y$):
+     $$X = \frac{(x_{\text{pixel}} - c_x) \cdot Z}{f_x}$$
+     $$Y = \frac{(y_{\text{pixel}} - c_y) \cdot Z}{f_y}$$
+
+3. **$W_{\text{real}}$ (*Real World Width*)**:
+   - Ukuran lebar fisik objek asli yang diketahui dalam satuan milimeter (mm) atau meter (m). Pada program ini, $W_{\text{real}} = 200\text{ mm}$ (jarak antar sudut chessboard terluar).
+
+4. **$w_{\text{pixel}}$ (*Image Pixel Width*)**:
+   - Ukuran lebar proyeksi objek yang terukur pada citra 2D dalam satuan piksel (`cv::norm(topRight - topLeft)`).
+
+5. **$Z$ (*Depth / Distance*)**:
+   - Jarak tegak lurus dari titik optik kamera ke permukaan objek dalam satuan milimeter (mm) atau meter (m).
 
 ### Cara Compile
 
@@ -205,7 +248,7 @@ g++ 3_depth.cpp -o 3_depth -I/usr/include/opencv4 -lopencv_core -lopencv_imgcode
 ./3_depth
 ```
 
-### Penjelasan Kode
+### Penjelasan Langkah Kode
 
 1. **Load Parameter Kalibrasi**: Membaca $f_x, f_y, c_x, c_y$ dari `yaml/kalibrasi.yaml`.
 2. **Deteksi Objek Referensi**: Mendeteksi sudut chessboard dan mengukur lebar piksel ($w_{\text{pixel}}$).
