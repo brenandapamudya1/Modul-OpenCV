@@ -192,3 +192,13 @@ rm -f 1_flip 2_resize 3_roi
 - Untuk 3_roi.cpp, ubah nilai `cv::Rect(x, y, width, height)` untuk memilih area
   yang berbeda dari gambar.
 - Tekan tombol apapun pada jendela untuk menutup program.
+
+---
+
+## Author
+
+- **Name**: Brenanda Caesa Pamudya
+- **Email**: brenandapamudya178@gmail.com
+
+If you have any questions or feedback, feel free to reach out via email!
+

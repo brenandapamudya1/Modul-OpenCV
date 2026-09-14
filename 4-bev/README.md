@@ -314,3 +314,13 @@ rm -f 1_bev 2_calib 3_depth
 - Dataset kalibrasi berasal dari
   [OpenCV Samples](https://github.com/opencv/opencv/tree/4.x/samples/data).
 - Tekan tombol apapun pada jendela untuk menutup program.
+
+---
+
+## Author
+
+- **Name**: Brenanda Caesa Pamudya
+- **Email**: brenandapamudya178@gmail.com
+
+If you have any questions or feedback, feel free to reach out via email!
+
