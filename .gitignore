@@ -1,14 +1,17 @@
 # Compiled binaries (g++ output)
-1-akses/gambar
-1-akses/video
-1-akses/kamera
-2-manipulasi/flip
-2-manipulasi/resize
-2-manipulasi/roi
-3-segmentation/convert
-3-segmentation/thresholding
-3-segmentation/morphology
-4-bev/main
+1-akses/1_gambar
+1-akses/2_video
+1-akses/3_kamera
+2-manipulasi/1_flip
+2-manipulasi/2_resize
+2-manipulasi/3_roi
+3-segmentation/1_convert
+3-segmentation/2_thresholding
+3-segmentation/3_morphology
+3-segmentation/main
+4-bev/1_bev
+4-bev/2_calib
+4-bev/3_depth
 
 # Results
 assets/result/2-manipulasi/*.jpg
