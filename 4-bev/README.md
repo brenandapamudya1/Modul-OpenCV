@@ -213,7 +213,7 @@ $$Z = \frac{f_x \cdot W_{\text{real}}}{w_{\text{pixel}}}$$
    - Nilai $f_x$ dan $f_y$ diperoleh dari kalibrasi kamera (`2_calib.cpp`) pada matriks intrinsik $K$:
 
 $$
-K = \begin{bmatrix} f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}
+K = \begin{bmatrix} f_x & 0 & c_x \\\\ 0 & f_y & c_y \\\\ 0 & 0 & 1 \end{bmatrix}
 $$
 
 2. **$c_x$ & $c_y$ (*Principal Point / Titik Pusat Optik*)**:
