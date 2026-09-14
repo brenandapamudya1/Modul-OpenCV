@@ -211,14 +211,17 @@ $$Z = \frac{f_x \cdot W_{\text{real}}}{w_{\text{pixel}}}$$
 1. **$f_x$ & $f_y$ (*Focal Length in Pixels*)**:
    - Jarak fokus lensa kamera yang dinyatakan dalam satuan piksel pada sumbu horizontal ($f_x$) dan vertikal ($f_y$).
    - Nilai $f_x$ dan $f_y$ diperoleh dari kalibrasi kamera (`2_calib.cpp`) pada matriks intrinsik $K$:
-     $$K = \begin{bmatrix} f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}$$
+
+$$
+K = \begin{bmatrix} f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}
+$$
 
 2. **$c_x$ & $c_y$ (*Principal Point / Titik Pusat Optik*)**:
    - **$c_x$**: Koordinat titik pusat optik lensa pada sumbu horizontal gambar (dalam piksel).
    - **$c_y$**: Koordinat titik pusat optik lensa pada sumbu vertikal gambar (dalam piksel).
    - **Fungsi $c_x$ dan $c_y$**: Menjadi titik acuan origin $(0,0,0)$ pada pusat optik lensa kamera (bukan di pojok kiri-atas citra $[0,0]$ piksel). Digunakan untuk menghitung pergeseran koordinat 3D horizontal ($X$) dan vertikal ($Y$):
-     $$X = \frac{(x_{\text{pixel}} - c_x) \cdot Z}{f_x}$$
-     $$Y = \frac{(y_{\text{pixel}} - c_y) \cdot Z}{f_y}$$
+
+$$X = \frac{(x_{\text{pixel}} - c_x) \cdot Z}{f_x}, \quad Y = \frac{(y_{\text{pixel}} - c_y) \cdot Z}{f_y}$$
 
 3. **$W_{\text{real}}$ (*Real World Width*)**:
    - Ukuran lebar fisik objek asli yang diketahui dalam satuan milimeter (mm) atau meter (m). Pada program ini, $W_{\text{real}} = 200\text{ mm}$ (jarak antar sudut chessboard terluar).
