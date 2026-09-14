@@ -2,7 +2,6 @@
 
 **Author**: Brenanda Caesa Pamudya  
 **Email**: brenandapamudya178@gmail.com  
-> *If you have any questions or feedback, feel free to reach out via email!*
 
 ---
 
@@ -312,4 +311,9 @@ rm -f 1_convert 2_thresholding 3_morphology main
 - Untuk program morphology, jumlah iterasi erode dan dilate dapat disesuaikan
   sesuai kebutuhan.
 - Tekan tombol apapun pada jendela untuk menutup program.
+
+---
+
+If you have any questions or feedback, feel free to reach out via email!
+
 
