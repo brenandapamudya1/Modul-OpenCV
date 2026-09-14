@@ -25,3 +25,8 @@ assets/result/4-bev/*.jpg
 # Debug files
 *.dSYM/
 *.su
+
+# YAML files
+*.yaml
+*.yml
+
