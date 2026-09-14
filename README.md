@@ -7,7 +7,7 @@
 
 Repositori ini berisi rangkaian modul praktikum dan eksperimen pemrosesan citra digital (*digital image processing*) serta komputer visi (*computer vision*) menggunakan library **OpenCV 4** berbasis **C++**.
 
-## 📌 Daftar Modul
+## Daftar Modul
 
 | Modul | Nama Modul | Deskripsi Topik |
 |---|---|---|
@@ -18,7 +18,7 @@ Repositori ini berisi rangkaian modul praktikum dan eksperimen pemrosesan citra 
 
 ---
 
-## 📁 Struktur Repositori
+## Struktur Repositori
 
 ```text
 OpenCV-Intern/
@@ -32,7 +32,7 @@ OpenCV-Intern/
 
 ---
 
-## 🛠️ Prasyarat & Instalasi
+## Prasyarat & Instalasi
 
 ### 1. Sistem Operasi & Tools
 - OS: Linux (Ubuntu/Debian) atau WSL
@@ -54,7 +54,7 @@ pkg-config --modversion opencv4
 
 ---
 
-## 🚀 Perintah Kompilasi Umum
+## Perintah Kompilasi Umum
 
 Gunakan perintah `g++` dengan flag `pkg-config` untuk melakukan kompilasi file C++ OpenCV:
 
